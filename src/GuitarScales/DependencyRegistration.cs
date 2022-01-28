@@ -9,5 +9,6 @@ public class DependencyRegistration
     {
         IoCContainer.Register<IMainViewModel, MainViewModel>();
         IoCContainer.RegisterSingleton<IMessengerWrapper, MessengerWrapper>();
+        IoCContainer.RegisterSingleton<INoteInitializer, NoteInitializer>();
     }
 }

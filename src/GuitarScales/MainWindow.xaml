@@ -10,6 +10,11 @@
         Title="MainWindow" Height="500" Width="525"
         DataContext="{Binding MainViewModel, Source={StaticResource ViewModelLocator}}"
         WindowState="Maximized">
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

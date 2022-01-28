@@ -13,12 +13,13 @@ namespace GuitarScales.ViewModel;
 
 public interface IMainViewModel
 {
-    List<GuitarString> Strings { get; set; }
-    List<Note> Notes { get; set; }
     RelayCommand ShowScaleNotesCommand { get; }
     RelayCommand ClearNotesCommand { get; }
     RelayCommand FindScaleCommand { get; }
     RelayCommand SetStringsAndTuningCommand { get; }
+    List<GuitarString> Strings { get; set; }
+    List<Note> Notes { get; set; }
+    RelayCommand LoadedCommand { get; }
     Note SelectedScaleNote { get; set; }
     ScaleType SelectedScaleType { get; set; }
     List<ScaleType> Scales { get; }
@@ -34,6 +35,8 @@ public interface IMainViewModel
 
 public class MainViewModel : ObservableRecipient, IMainViewModel
 {
+    private readonly IMessengerWrapper _messenger;
+    private readonly INoteInitializer _noteInitializer;
     private readonly List<Note> _selectedNotes = new();
     private bool _isArpeggio;
     private Note _note;
@@ -46,36 +49,22 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
     private Tuning _selectedTuning;
     private List<GuitarString> _strings;
 
-    public MainViewModel(IMessengerWrapper messenger)
+    public MainViewModel(IMessengerWrapper messenger, INoteInitializer noteInitializer)
     {
-        InitializeNotes();
+        _messenger = messenger;
+        _noteInitializer = noteInitializer;
+    }
 
-        Notes = _note.GetFollowingNotes();
-        SelectedScaleNote = Notes.First();
-        SelectedScaleType = Scales.First();
+    public RelayCommand LoadedCommand => new(Loaded);
+    public RelayCommand ShowScaleNotesCommand => new(ShowScaleNotesAsync);
+    public RelayCommand ClearNotesCommand => new(ClearNotes);
+    public RelayCommand FindScaleCommand => new(FindScale);
+    public RelayCommand SetStringsAndTuningCommand => new(SetStringsAndTuning);
 
-        Strings = new List<GuitarString>
-        {
-            new(messenger) { SelectedTune = _note.GetNote(typeof(E)), Tunings = Notes },
-            new(messenger) { SelectedTune = _note.GetNote(typeof(B)), Tunings = Notes },
-            new(messenger) { SelectedTune = _note.GetNote(typeof(G)), Tunings = Notes },
-            new(messenger) { SelectedTune = _note.GetNote(typeof(D)), Tunings = Notes },
-            new(messenger) { SelectedTune = _note.GetNote(typeof(A)), Tunings = Notes },
-            new(messenger) { SelectedTune = _note.GetNote(typeof(E)), Tunings = Notes }
-        };
-
-        messenger.Register<MainViewModel, NoteSelectedMessage>(this, (r, message) =>
-        {
-            var noteIsInList = _selectedNotes.Any(x => x.Index == message.Note.Index);
-            if (noteIsInList && message.DeSelected)
-            {
-                _selectedNotes.RemoveAll(x => x.Index == message.Note.Index);
-            }
-            else if (!noteIsInList)
-            {
-                _selectedNotes.Add(message.Note);
-            }
-        });
+    public Note SelectedScaleNote
+    {
+        get => _selectedScaleNote;
+        set => SetProperty(ref _selectedScaleNote, value);
     }
 
     public List<GuitarString> Strings
@@ -88,17 +77,6 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
     {
         get => _notes;
         set => SetProperty(ref _notes, value);
-    }
-
-    public RelayCommand ShowScaleNotesCommand => new(ShowScaleNotesAsync);
-    public RelayCommand ClearNotesCommand => new(ClearNotes);
-    public RelayCommand FindScaleCommand => new(FindScale);
-    public RelayCommand SetStringsAndTuningCommand => new(SetStringsAndTuning);
-
-    public Note SelectedScaleNote
-    {
-        get => _selectedScaleNote;
-        set => SetProperty(ref _selectedScaleNote, value);
     }
 
     public ScaleType SelectedScaleType
@@ -156,49 +134,6 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
         set => SetProperty(ref _isArpeggio, value);
     }
 
-    public void InitializeNotes()
-    {
-        var ab = new Ab { Index = 0 };
-        var a = new A { Index = 1 };
-        var bb = new Bb { Index = 2 };
-        var b = new B { Index = 3 };
-        var c = new C { Index = 4 };
-        var db = new Db { Index = 5 };
-        var d = new D { Index = 6 };
-        var eb = new Eb { Index = 7 };
-        var e = new E { Index = 8 };
-        var f = new F { Index = 9 };
-        var gb = new Gb { Index = 10 };
-        var g = new G { Index = 11 };
-
-        ab.Next = a;
-        ab.Previous = g;
-        a.Next = bb;
-        a.Previous = ab;
-        bb.Next = b;
-        bb.Previous = a;
-        b.Next = c;
-        b.Previous = bb;
-        c.Next = db;
-        c.Previous = b;
-        db.Next = d;
-        db.Previous = c;
-        d.Next = eb;
-        d.Previous = db;
-        eb.Next = e;
-        eb.Previous = d;
-        e.Next = f;
-        e.Previous = eb;
-        f.Next = gb;
-        f.Previous = e;
-        gb.Next = g;
-        gb.Previous = f;
-        g.Next = ab;
-        g.Previous = gb;
-
-        _note = ab;
-    }
-
     public void SetStringsAndTuning()
     {
         Strings.ToStandardTune();
@@ -253,6 +188,38 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
         }
     }
 
+    public void Loaded()
+    {
+        _note = _noteInitializer.Initialize();
+
+        Notes = _note.GetFollowingNotes();
+        SelectedScaleNote = Notes.First();
+        SelectedScaleType = Scales.First();
+
+        Strings = new List<GuitarString>
+        {
+            new(_messenger) { SelectedTune = _note.GetNote(typeof(E)), Tunings = Notes },
+            new(_messenger) { SelectedTune = _note.GetNote(typeof(B)), Tunings = Notes },
+            new(_messenger) { SelectedTune = _note.GetNote(typeof(G)), Tunings = Notes },
+            new(_messenger) { SelectedTune = _note.GetNote(typeof(D)), Tunings = Notes },
+            new(_messenger) { SelectedTune = _note.GetNote(typeof(A)), Tunings = Notes },
+            new(_messenger) { SelectedTune = _note.GetNote(typeof(E)), Tunings = Notes }
+        };
+
+        _messenger.Register<MainViewModel, NoteSelectedMessage>(this, (r, message) =>
+        {
+            var noteIsInList = _selectedNotes.Any(x => x.Index == message.Note.Index);
+            if (noteIsInList && message.DeSelected)
+            {
+                _selectedNotes.RemoveAll(x => x.Index == message.Note.Index);
+            }
+            else if (!noteIsInList)
+            {
+                _selectedNotes.Add(message.Note);
+            }
+        });
+    }
+
     public void ShowScaleNotesAsync()
     {
         Task.Factory.StartNew(ShowScaleNotes);
@@ -270,11 +237,11 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
 
     public void FindScale()
     {
-        var orderedNotes = _selectedNotes.OrderBy(x => x.Index);
+        var orderedNotes = _selectedNotes.OrderBy(x => x.Index).ToList();
         var scales = new List<Scale>();
         foreach (var scaleType in Scales)
         {
-            var isPartOfScale = scaleType.GetRootNoteOfScaleFromNoteCandidates(_note, orderedNotes.ToList());
+            var isPartOfScale = scaleType.GetRootNoteOfScaleFromNoteCandidates(_note, orderedNotes);
             scales.AddRange(
                 isPartOfScale.Select(
                     x => new Scale { RootNote = x, ScaleType = scaleType, Notes = scaleType.CreateScaleNotes(x) }));
