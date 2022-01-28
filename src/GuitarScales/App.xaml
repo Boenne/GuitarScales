@@ -1,0 +1,19 @@
+﻿<Application x:Class="GuitarScales.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModel="clr-namespace:GuitarScales.ViewModel"
+             xmlns:converters="clr-namespace:GuitarScales.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <viewModel:ViewModelLocator x:Key="ViewModelLocator" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <converters:NoteSelectionToColorConverter x:Key="NoteSelectionToColorConverter" />
+        <converters:NoteSelectionToForegroundColorConverter x:Key="NoteSelectionToForegroundColorConverter" />
+        <converters:NotesToStringConverter x:Key="NotesToStringConverter" />
+        <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
+        <converters:FretLengthConverter x:Key="FretLengthConverter" />
+        <converters:FretNumberConverter x:Key="FretNumberConverter" />
+        <converters:NoteLabelWidthConverter x:Key="NoteLabelWidthConverter" />
+        <converters:NoteSelectionEllipseWidthConverter x:Key="NoteSelectionEllipseWidthConverter" />
+    </Application.Resources>
+</Application>
