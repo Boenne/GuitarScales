@@ -12,15 +12,15 @@ public abstract class ScaleType
     public List<Note> CreateScaleNotes(Note rootNote)
     {
         var notesFollowingKey = rootNote.GetFollowingNotes();
-        var list = Pattern.Select(i => notesFollowingKey[i]).ToList();
-        return list;
+        var notesInScales = Pattern.Select(i => notesFollowingKey[i]).ToList();
+        return notesInScales;
     }
 
     public List<Note> CreateArpeggioScaleNotes(Note rootNote)
     {
         var notesFollowingKey = rootNote.GetFollowingNotes();
-        var list = ArpeggioPattern.Select(i => notesFollowingKey[i]).ToList();
-        return list;
+        var notesInScales = ArpeggioPattern.Select(i => notesFollowingKey[i]).ToList();
+        return notesInScales;
     }
 
     public List<Note> GetRootNoteOfScaleFromNoteCandidates(Note note, List<Note> noteCandidates)
@@ -30,8 +30,10 @@ public abstract class ScaleType
         do
         {
             var scaleNotes = CreateScaleNotes(currentNote);
-            var all = noteCandidates.All(noteCandidate => scaleNotes.Any(x => x.Equals(noteCandidate)));
-            if (all)
+            var scaleContainsAllNotes =
+                noteCandidates.All(noteCandidate => scaleNotes.Any(x => x.Equals(noteCandidate)));
+
+            if (scaleContainsAllNotes)
             {
                 scales.Add(currentNote);
             }
