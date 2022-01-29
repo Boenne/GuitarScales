@@ -12,18 +12,20 @@ public class GuitarString : ObservableRecipient
     private readonly IMessengerWrapper _messenger;
     private readonly ObservableCollection<NoteViewModel> _notes = new();
     private Scale _selectedScale;
-    private Note _selectedTune;
+    private Note _selectedTuning;
     private bool _show = true;
     private List<Note> _tunings;
 
-    public GuitarString(IMessengerWrapper messenger)
+    public GuitarString(IMessengerWrapper messenger, Note selectedTuning, List<Note> tunings)
     {
         _messenger = messenger;
+        SelectedTuning = selectedTuning;
+        Tunings = tunings;
     }
 
     public IEnumerable<NoteViewModel> Notes => _notes;
 
-    public Note TempTune { get; set; }
+    public Note TempTuning { get; set; }
 
     public bool Show
     {
@@ -31,18 +33,18 @@ public class GuitarString : ObservableRecipient
         set => SetProperty(ref _show, value);
     }
 
-    public Note SelectedTune
+    public Note SelectedTuning
     {
-        get => _selectedTune;
+        get => _selectedTuning;
         set
         {
-            if (SelectedTune != null && SelectedTune.Equals(value))
+            if (_selectedTuning != null && _selectedTuning.Equals(value))
             {
                 return;
             }
 
-            SetProperty(ref _selectedTune, value);
-            TuneChanged();
+            SetProperty(ref _selectedTuning, value);
+            TuningChanged();
         }
     }
 
@@ -62,19 +64,19 @@ public class GuitarString : ObservableRecipient
         set => SetProperty(ref _tunings, value);
     }
 
-    public void TuneChanged()
+    public void TuningChanged()
     {
         _notes.Clear();
-        foreach (var tune in SelectedTune.GetNotesForString())
+        foreach (var note in SelectedTuning.GetNotesForString())
         {
-            _notes.Add(new NoteViewModel(_messenger) { Note = tune, NoteSelection = GetNoteSelection(tune) });
+            _notes.Add(new NoteViewModel(_messenger) { Note = note, NoteSelection = GetNoteSelection(note) });
         }
     }
 
     public void Tune()
     {
-        SelectedTune = TempTune;
-        TempTune = null;
+        SelectedTuning = TempTuning;
+        TempTuning = null;
     }
 
     private void SelectNotes()

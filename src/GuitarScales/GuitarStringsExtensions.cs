@@ -12,18 +12,18 @@ public static class GuitarStringsExtensions
         {
             for (var i = 0; i < steps; i++)
             {
-                guitarString.TempTune = guitarString.TempTune?.Previous ?? guitarString.SelectedTune.Previous;
+                guitarString.TempTuning = guitarString.TempTuning?.Previous ?? guitarString.SelectedTuning.Previous;
             }
         }
     }
 
     public static void ToStandardTune(this List<GuitarString> strings)
     {
-        strings[0].TempTune = strings[0].SelectedTune.GetNote(typeof(E));
-        strings[1].TempTune = strings[1].SelectedTune.GetNote(typeof(B));
-        strings[2].TempTune = strings[2].SelectedTune.GetNote(typeof(G));
-        strings[3].TempTune = strings[3].SelectedTune.GetNote(typeof(D));
-        strings[4].TempTune = strings[4].SelectedTune.GetNote(typeof(A));
-        strings[5].TempTune = strings[5].SelectedTune.GetNote(typeof(E));
+        strings[0].TempTuning = strings[0].SelectedTuning.GetNote(typeof(E));
+        strings[1].TempTuning = strings[1].SelectedTuning.GetNote(typeof(B));
+        strings[2].TempTuning = strings[2].SelectedTuning.GetNote(typeof(G));
+        strings[3].TempTuning = strings[3].SelectedTuning.GetNote(typeof(D));
+        strings[4].TempTuning = strings[4].SelectedTuning.GetNote(typeof(A));
+        strings[5].TempTuning = strings[5].SelectedTuning.GetNote(typeof(E));
     }
 }

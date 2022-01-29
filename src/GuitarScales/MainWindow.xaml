@@ -28,7 +28,7 @@
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal"
                                 Visibility="{Binding Show, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <ComboBox ItemsSource="{Binding Tunings}" SelectedItem="{Binding SelectedTune}" Width="70" />
+                        <ComboBox ItemsSource="{Binding Tunings}" SelectedItem="{Binding SelectedTuning}" Width="70" />
                         <ItemsControl ItemsSource="{Binding Notes}" AlternationCount="100">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
