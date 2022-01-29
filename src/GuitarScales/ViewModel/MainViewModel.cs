@@ -16,7 +16,6 @@ public interface IMainViewModel
     RelayCommand ShowScaleNotesCommand { get; }
     RelayCommand ClearNotesCommand { get; }
     RelayCommand FindScaleCommand { get; }
-    RelayCommand SetStringsAndTuningCommand { get; }
     List<GuitarString> Strings { get; set; }
     List<Note> Notes { get; set; }
     RelayCommand LoadedCommand { get; }
@@ -59,7 +58,6 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
     public RelayCommand ShowScaleNotesCommand => new(ShowScaleNotesAsync);
     public RelayCommand ClearNotesCommand => new(ClearNotes);
     public RelayCommand FindScaleCommand => new(FindScale);
-    public RelayCommand SetStringsAndTuningCommand => new(SetStringsAndTuning);
 
     public Note SelectedScaleNote
     {
@@ -105,7 +103,11 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
     public int SelectedNumberOfStrings
     {
         get => _selectedNumberOfStrings;
-        set => SetProperty(ref _selectedNumberOfStrings, value);
+        set
+        {
+            SetProperty(ref _selectedNumberOfStrings, value); 
+            SetStringsAndTuning();
+        }
     }
 
     public Dictionary<Tuning, string> Tunings
@@ -126,7 +128,11 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
     public Tuning SelectedTuning
     {
         get => _selectedTuning;
-        set => SetProperty(ref _selectedTuning, value);
+        set
+        {
+            SetProperty(ref _selectedTuning, value);
+            SetStringsAndTuning();
+        }
     }
 
     public bool IsArpeggio
