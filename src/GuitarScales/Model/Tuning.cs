@@ -3,9 +3,10 @@
 public enum Tuning
 {
     Standard,
-    HalfStepDown,
     DropD,
-    D,
+    StandardEb,
+    DropDb,
+    StandardD,
     DropC,
     DropB,
     DropA,

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -112,10 +112,11 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
         =>
             new()
             {
-                { Tuning.Standard, "Standard" },
-                { Tuning.HalfStepDown, "Half step down" },
+                { Tuning.Standard, "Standard E" },
                 { Tuning.DropD, "Drop D" },
-                { Tuning.D, "D" },
+                { Tuning.StandardEb, "Standard E♭" },
+                { Tuning.DropDb, "Drop D♭" },
+                { Tuning.StandardD, "Standard D" },
                 { Tuning.DropC, "Drop C" },
                 { Tuning.DropB, "Drop B" },
                 { Tuning.DropA, "Drop A" },
@@ -141,12 +142,16 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
         switch (SelectedTuning)
         {
             case Tuning.DropD:
-                Strings[5].TempTuning = _note.GetNote(typeof(D));
+                Strings[5].TempTuning = Strings[3].TempTuning;
                 break;
-            case Tuning.HalfStepDown:
+            case Tuning.StandardEb:
                 Strings.DownTune(1);
                 break;
-            case Tuning.D:
+            case Tuning.DropDb:
+                Strings.DownTune(1);
+                Strings[5].TempTuning = Strings[3].TempTuning;
+                break;
+            case Tuning.StandardD:
                 Strings.DownTune(2);
                 break;
             case Tuning.DropC:
@@ -198,13 +203,15 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
 
         Strings = new List<GuitarString>
         {
-            new(_messenger, _note.GetNote(typeof(E)), Notes),
-            new(_messenger, _note.GetNote(typeof(B)), Notes),
-            new(_messenger, _note.GetNote(typeof(G)), Notes),
-            new(_messenger, _note.GetNote(typeof(D)), Notes),
-            new(_messenger, _note.GetNote(typeof(A)), Notes),
-            new(_messenger, _note.GetNote(typeof(E)), Notes)
+            new(_messenger, _note, Notes),
+            new(_messenger, _note, Notes),
+            new(_messenger, _note, Notes),
+            new(_messenger, _note, Notes),
+            new(_messenger, _note, Notes),
+            new(_messenger, _note, Notes)
         };
+
+        Strings.ToStandardTune(true);
 
         _messenger.Register<MainViewModel, NoteSelectedMessage>(this, (r, message) =>
         {
