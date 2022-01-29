@@ -6,20 +6,12 @@ namespace GuitarScales.Model;
 public abstract class ScaleType
 {
     public abstract int[] Pattern { get; }
-    public abstract int[] ArpeggioPattern { get; }
     public abstract string Name { get; }
 
     public List<Note> CreateScaleNotes(Note rootNote)
     {
         var notesFollowingKey = rootNote.GetFollowingNotes();
         var notesInScales = Pattern.Select(i => notesFollowingKey[i]).ToList();
-        return notesInScales;
-    }
-
-    public List<Note> CreateArpeggioScaleNotes(Note rootNote)
-    {
-        var notesFollowingKey = rootNote.GetFollowingNotes();
-        var notesInScales = ArpeggioPattern.Select(i => notesFollowingKey[i]).ToList();
         return notesInScales;
     }
 

@@ -29,7 +29,6 @@ public interface IMainViewModel
     int SelectedNumberOfStrings { get; set; }
     Dictionary<Tuning, string> Tunings { get; }
     Tuning SelectedTuning { get; set; }
-    bool IsArpeggio { get; set; }
 }
 
 public class MainViewModel : ObservableRecipient, IMainViewModel
@@ -135,12 +134,6 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
         }
     }
 
-    public bool IsArpeggio
-    {
-        get => _isArpeggio;
-        set => SetProperty(ref _isArpeggio, value);
-    }
-
     public void SetStringsAndTuning()
     {
         Strings.ToStandardTune();
@@ -241,9 +234,7 @@ public class MainViewModel : ObservableRecipient, IMainViewModel
     public void ShowScaleNotes()
     {
         ClearScaleMatches();
-        var scaleNotes = IsArpeggio
-            ? SelectedScaleType.CreateArpeggioScaleNotes(SelectedScaleNote)
-            : SelectedScaleType.CreateScaleNotes(SelectedScaleNote);
+        var scaleNotes = SelectedScaleType.CreateScaleNotes(SelectedScaleNote);
         Scale = new Scale { Notes = scaleNotes, RootNote = SelectedScaleNote, ScaleType = SelectedScaleType };
         Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, (Action)SetScaleOnEachString);
     }
